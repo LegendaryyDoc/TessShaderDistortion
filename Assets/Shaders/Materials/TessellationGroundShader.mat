@@ -41,10 +41,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Displacement: 0.3
-    - _DisplacementAmount: -0.05
+    - _DisplacementAmount: -0.1
+    - _DisplacementAmountMax: -0.1
     - _EdgeLength: 2
     - _Glossiness: 0.5
     - _Metallic: 0
+    - _ObjectMass: 1
     - _Phong: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

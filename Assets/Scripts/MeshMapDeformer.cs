@@ -18,7 +18,7 @@ public class MeshMapDeformer : MonoBehaviour
         deformedMeshTex = new Texture2D(textureSize, textureSize);
         deformedMeshTex.wrapMode = TextureWrapMode.Clamp;
 
-        for (int i = 0; i < textureSize; i++) // setting the mesh to black
+        for (int i = 0; i < textureSize; i++) // setting the texture to black
         {
             for (int j = 0; j < textureSize; j++)
             {
@@ -30,7 +30,7 @@ public class MeshMapDeformer : MonoBehaviour
         if (TryGetComponent<Renderer>(out Renderer rend))
         {
             curRenderer = rend;
-            curRenderer.material.SetTexture("_DisplacementMap", deformedMeshTex);
+            curRenderer.material.SetTexture("_DisplacementMap", deformedMeshTex); // setting the displacement the newly blacked out texture
         }
 
         if (rainbowPixels)
@@ -48,6 +48,7 @@ public class MeshMapDeformer : MonoBehaviour
         }
     }
 
+    // helps visual the pixels
     private void PixelColorSizeHelp()
     {
         Texture2D rainbow = new Texture2D(textureSize, textureSize);
@@ -84,12 +85,16 @@ public class MeshMapDeformer : MonoBehaviour
         for(int i = 0; i < contactCount; i++)
         {
             RaycastHit hit;
-            if(Physics.Raycast(points[i].otherCollider.gameObject.transform.position, points[i].normal, out hit))
+
+            // raycasting from middle of object in direction of contacts normal
+            if (Physics.Raycast(points[i].otherCollider.gameObject.transform.position, points[i].normal, out hit))
             {
+                // grabs the shader uvs
                 Vector2 pixelUV = hit.textureCoord;
                 pixelUV.x *= textureSize;
                 pixelUV.y *= textureSize;
 
+                // setting the pixels to white where they are colliding with
                 deformedMeshTex.SetPixel((int)pixelUV.x, (int)pixelUV.y, Color.white);
                 shouldUpdate = true;
             }

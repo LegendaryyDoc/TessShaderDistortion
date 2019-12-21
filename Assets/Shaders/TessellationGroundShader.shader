@@ -5,8 +5,8 @@
 		_EdgeLength("Edge length", Range(2,50)) = 5
 		_Phong("Phong Strengh", Range(0,1)) = 0.5
 		_MainTex("Base (RGB)", 2D) = "white" {}
-		_DisplacementMap("Displacement Map (R)", 2D) = "black" {}
-		_DisplacementAmount("Displacement Amount", Float) = 0.1
+		[HideInInspector] _DisplacementMap("Displacement Map (R)", 2D) = "black" {}
+		_DisplacementAmountMax("Displacement Amount", Float) = 0.1
 		_Color("Color", color) = (1,1,1,0)
 	}
 	SubShader
@@ -28,12 +28,12 @@
 		};
 
 		sampler2D _DisplacementMap;
-		float _DisplacementAmount;
+		float _DisplacementAmountMax;
 
 		void dispNone(inout appdata v) 
 		{
-			float disp = tex2Dlod(_DisplacementMap, float4(v.texcoord1.xy, 0,0)).r;
-			v.vertex.xyz += v.normal * _DisplacementAmount * disp;
+			float disp = tex2Dlod(_DisplacementMap, float4(v.texcoord1.xy,0,0)).r;
+			v.vertex.xyz += v.normal * _DisplacementAmountMax * disp;
 			v.texcoord1 = float2(0,0);
 		}
 
