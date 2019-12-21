@@ -11,6 +11,7 @@ public class MeshMapDeformer : MonoBehaviour
     [HideInInspector] public Texture2D deformedMeshTex; // Texture changing color
 
     public int textureSize = 64; // size that the texture will be for x and y
+    public bool rainbowPixels = false;
 
     private void Start()
     {
@@ -31,6 +32,11 @@ public class MeshMapDeformer : MonoBehaviour
             curRenderer = rend;
             curRenderer.material.SetTexture("_DisplacementMap", deformedMeshTex);
         }
+
+        if (rainbowPixels)
+        {
+            PixelColorSizeHelp();
+        }
     }
 
     private void Update()
@@ -42,26 +48,51 @@ public class MeshMapDeformer : MonoBehaviour
         }
     }
 
+    private void PixelColorSizeHelp()
+    {
+        Texture2D rainbow = new Texture2D(textureSize, textureSize);
+
+        Color[] colorArr = new Color[9];
+        colorArr[0] = Color.black;
+        colorArr[1] = Color.blue;
+        colorArr[2] = Color.cyan;
+        colorArr[3] = Color.gray;
+        colorArr[4] = Color.green;
+        colorArr[5] = Color.magenta;
+        colorArr[6] = Color.red;
+        colorArr[7] = Color.white;
+        colorArr[8] = Color.yellow;
+
+        for (int i = 0; i < textureSize; i++) // setting the mesh to black
+        {
+            for (int j = 0; j < textureSize; j++)
+            {
+                rainbow.SetPixel(i, j, colorArr[Random.Range(0, 9)]);
+            }
+        }
+
+        rainbow.Apply();
+        curRenderer.material.SetTexture("_MainTex", rainbow);
+    }
+
     private void OnCollisionStay(Collision collision)
     {
         // When Colliding need to find out what pixels are being touched and then turn them white
         List<ContactPoint> points = new List<ContactPoint>();
-        collision.GetContacts(points);
+        int contactCount = collision.GetContacts(points);
 
-        Debug.Log(collision.contactCount);
-
-        foreach (var contact in points)
+        for(int i = 0; i < contactCount; i++)
         {
-            Vector3 diff = this.transform.position - contact.point; // gets the position difference of the objects
+            RaycastHit hit;
+            if(Physics.Raycast(points[i].otherCollider.gameObject.transform.position, points[i].normal, out hit))
+            {
+                Vector2 pixelUV = hit.textureCoord;
+                pixelUV.x *= textureSize;
+                pixelUV.y *= textureSize;
 
-            float rows = (curRenderer.bounds.size.x / textureSize) * diff.x;
-            float cols = (curRenderer.bounds.size.z / textureSize) * diff.z;
-
-            int x = textureSize - Mathf.RoundToInt(textureSize * rows);
-            int y = textureSize - Mathf.RoundToInt(textureSize * cols);
-
-            deformedMeshTex.SetPixel(x, y, Color.white);
-            shouldUpdate = true;
+                deformedMeshTex.SetPixel((int)pixelUV.x, (int)pixelUV.y, Color.white);
+                shouldUpdate = true;
+            }
         }
     }
 }

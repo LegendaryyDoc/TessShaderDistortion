@@ -41,8 +41,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Displacement: 0.3
-    - _DisplacementAmount: -0.1
-    - _EdgeLength: 19.4
+    - _DisplacementAmount: -0.05
+    - _EdgeLength: 2
     - _Glossiness: 0.5
     - _Metallic: 0
     - _Phong: 1

@@ -12,10 +12,10 @@
 	SubShader
 	{
 		Tags { "RenderType" = "Opaque"  "LightMode" = "ShadowCaster" }
-		LOD 300
+		LOD 400
 
 		CGPROGRAM
-		#pragma surface surf Lambert vertex:dispNone tessellate:tessEdge tessphong:_Phong nolightmap
+		#pragma surface surf Lambert vertex:dispNone tessellate:tessEdge tessphong:_Phong
 		#include "Tessellation.cginc"
 
 		struct appdata 
@@ -23,6 +23,8 @@
 			float4 vertex : POSITION;
 			float3 normal : NORMAL;
 			float2 texcoord : TEXCOORD0;
+			float2 texcoord1 : TEXCOORD1;
+			float2 texcoord2 : TEXCOORD2;
 		};
 
 		sampler2D _DisplacementMap;
@@ -30,8 +32,9 @@
 
 		void dispNone(inout appdata v) 
 		{
-			float disp = tex2Dlod(_DisplacementMap, float4(v.texcoord.xy, 0,0)).r;
+			float disp = tex2Dlod(_DisplacementMap, float4(v.texcoord1.xy, 0,0)).r;
 			v.vertex.xyz += v.normal * _DisplacementAmount * disp;
+			v.texcoord1 = float2(0,0);
 		}
 
 		float _Phong;
