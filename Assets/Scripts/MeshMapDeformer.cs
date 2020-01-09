@@ -5,7 +5,7 @@ using UnityEngine;
 public class MeshMapDeformer : MonoBehaviour
 {
     private bool shouldUpdate = false;
-    private int radius = 10;
+    private Vector3 radius = new Vector3(1,1,1);
     private Material deformedMeshMat; // Material of the object
     private Renderer curRenderer;
 
@@ -105,8 +105,11 @@ public class MeshMapDeformer : MonoBehaviour
         deformedMeshTex.Apply();
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionStay(Collision collision) /* if can fine better way to do this getting too nested */
     {
+        radius = collision.gameObject.transform.lossyScale / 2;
+        Debug.Log(radius);       
+
         // When Colliding need to find out what pixels are being touched and then turn them white
         List<ContactPoint> points = new List<ContactPoint>();
         int contactCount = collision.GetContacts(points);
@@ -124,7 +127,25 @@ public class MeshMapDeformer : MonoBehaviour
                 pixelUV.y *= textureSize;
 
                 // setting the pixels to white where they are colliding with
-                deformedMeshTex.SetPixel((int)pixelUV.x, (int)pixelUV.y, Color.white);
+                for(int j = 0; j < textureSize; j++)
+                {
+                    for(int k = 0; k < textureSize; k++)
+                    {
+                        if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter mf))
+                        {
+                            Debug.Log("Bounds: " + mf.sharedMesh.bounds.extents);
+                            Debug.Log("Lossy: " + gameObject.transform.lossyScale);
+
+                            if (j < (pixelUV.x + ((textureSize / 2) * (radius.x / (mf.sharedMesh.bounds.extents.x * gameObject.transform.lossyScale.x)))) &&
+                                j > (pixelUV.x - ((textureSize / 2) * (radius.x / (mf.sharedMesh.bounds.extents.x * gameObject.transform.lossyScale.x)))) &&
+                                k < (pixelUV.y + ((textureSize / 2) * (radius.z / (mf.sharedMesh.bounds.extents.z * gameObject.transform.lossyScale.z)))) &&
+                                k > (pixelUV.y - ((textureSize / 2) * (radius.z / (mf.sharedMesh.bounds.extents.z * gameObject.transform.lossyScale.z)))))
+                            {
+                                deformedMeshTex.SetPixel(j, k, Color.white);
+                            }
+                        }
+                    }
+                }
                 shouldUpdate = true;
             }
         }
