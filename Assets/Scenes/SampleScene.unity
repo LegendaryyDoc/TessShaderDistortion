@@ -227,8 +227,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deformedMeshTex: {fileID: 0}
-  textureSize: 64
+  textureSize: 256
   rainbowPixels: 0
+  DisplacementMapMainTexture: 0
+  colorChangeAmount: {x: 0.005, y: 0.005, z: 0.005, w: 0}
 --- !u!1 &170076733
 GameObject:
   m_ObjectHideFlags: 0

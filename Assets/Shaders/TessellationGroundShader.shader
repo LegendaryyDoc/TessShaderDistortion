@@ -8,6 +8,7 @@
 		[HideInInspector] _DisplacementMap("Displacement Map (R)", 2D) = "black" {}
 		_DisplacementAmountMax("Displacement Amount", Float) = 0.1
 		_Color("Color", color) = (1,1,1,0)
+		_ColorReturnSpeed("Color Return Speed", Float) = 0.01
 	}
 	SubShader
 	{
@@ -29,6 +30,7 @@
 
 		sampler2D _DisplacementMap;
 		float _DisplacementAmountMax;
+		fixed4 _ColorReturnSpeed;
 
 		void dispNone(inout appdata v) 
 		{

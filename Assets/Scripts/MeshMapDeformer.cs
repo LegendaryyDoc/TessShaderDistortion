@@ -5,6 +5,7 @@ using UnityEngine;
 public class MeshMapDeformer : MonoBehaviour
 {
     private bool shouldUpdate = false;
+    private int radius = 10;
     private Material deformedMeshMat; // Material of the object
     private Renderer curRenderer;
 
@@ -12,6 +13,8 @@ public class MeshMapDeformer : MonoBehaviour
 
     public int textureSize = 64; // size that the texture will be for x and y
     public bool rainbowPixels = false;
+    public bool DisplacementMapMainTexture = false;
+    public Vector4 colorChangeAmount = new Vector4(0.1f,0.1f,0.1f,0);
 
     private void Start()
     {
@@ -30,7 +33,14 @@ public class MeshMapDeformer : MonoBehaviour
         if (TryGetComponent<Renderer>(out Renderer rend))
         {
             curRenderer = rend;
-            curRenderer.material.SetTexture("_DisplacementMap", deformedMeshTex); // setting the displacement the newly blacked out texture
+            if (DisplacementMapMainTexture == false)
+            {
+                curRenderer.material.SetTexture("_DisplacementMap", deformedMeshTex); // setting the displacement the newly blacked out texture
+            }
+            else
+            {
+                curRenderer.material.SetTexture("_MainTex", deformedMeshTex); // setting the displacement the newly blacked out texture
+            }
         }
 
         if (rainbowPixels)
@@ -41,6 +51,8 @@ public class MeshMapDeformer : MonoBehaviour
 
     private void Update()
     {
+        ReturningDisplacement();
+
         if (shouldUpdate) // only send information to the gpu when needed
         {
             deformedMeshTex.Apply();
@@ -74,6 +86,23 @@ public class MeshMapDeformer : MonoBehaviour
 
         rainbow.Apply();
         curRenderer.material.SetTexture("_MainTex", rainbow);
+    }
+
+    private void ReturningDisplacement() // returning the color back to black
+    {
+        Color tempColorChange;
+
+        for (int i = 0; i < textureSize; i++)
+        {
+            for(int j = 0; j < textureSize; j++)
+            {
+                tempColorChange = deformedMeshTex.GetPixel(i, j) - new Color(colorChangeAmount.x, colorChangeAmount.y, colorChangeAmount.z);
+
+                deformedMeshTex.SetPixel(i, j, tempColorChange);
+            }
+        }
+
+        deformedMeshTex.Apply();
     }
 
     private void OnCollisionStay(Collision collision)
